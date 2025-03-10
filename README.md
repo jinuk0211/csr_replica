@@ -140,7 +140,18 @@ def load_llava_model(model_path, base_hf_model_path, mapping_path):
 def sentence_level_beam_search_tree(qid, model, accelerator, processor, tokenizer, after_tokenizer, initial_text, images, sentence_end_id, max_length, max_new_tokens, num_beams, num_beam_group, token_level_beams, diversity_penalty):
     root = Node(initial_text, 0, 0) #self, text, score, depth, parent=None, is_final=False
     active_nodes = [root]
-
+#------------------
+class Node:
+    def __init__(self, text, score, depth, parent=None, is_final=False):
+        self.text = text
+        self.score = score
+        self.depth = depth
+        self.parent = parent
+        self.children = []
+        self.is_final = is_final
+    def add_child(self, child):
+        self.children.append(child)
+#-------------------
     with torch.no_grad():
         while active_nodes:
             new_nodes = []
