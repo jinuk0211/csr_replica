@@ -238,6 +238,34 @@ accelerate launch \
   --clip_model_path $CLIP_MODEL_PATH
 ```
 ```python
+class Rank_Node:
+    def __init__(self, text, score, depth, parent=None, is_final=False, clip_score=None):
+        self.text = text
+        self.score = score
+        self.depth = depth
+        self.parent = parent
+        self.children = []
+        self.is_final = is_final
+        self.rank = None
+        self.clip_score = clip_score
+        self.clip_rank = None
+
+    def add_child(self, child):
+        self.children.append(child)
+        child.parent = self
+
+    def calculate_ranks(self):
+        if self.children:
+            sorted_children_by_score = sorted(self.children, key=lambda x: x.score, reverse=True)
+            total_children = len(sorted_children_by_score)
+            for index, child in enumerate(sorted_children_by_score):
+                child.rank = (index + 1) / total_children
+
+            sorted_children_by_clip_score = sorted(self.children, key=lambda x: x.clip_score, reverse=True)
+            for index, child in enumerate(sorted_children_by_clip_score):
+                child.clip_rank = (index + 1) / total_children
+        for child in self.children:
+            child.calculate_ranks()
 import os
 import json
 from transformers import CLIPModel, AutoProcessor
